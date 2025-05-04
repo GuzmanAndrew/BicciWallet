@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "739518695270",
+    "project_id": "appwalletbank",
+    "storage_bucket": "appwalletbank.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:739518695270:android:b7078c12926b816818eaa7",
+        "android_client_info": {
+          "package_name": "com.example.bankwallet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8n_JE-TWCuO_rx6VHio1DFej7yW3cmQ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
