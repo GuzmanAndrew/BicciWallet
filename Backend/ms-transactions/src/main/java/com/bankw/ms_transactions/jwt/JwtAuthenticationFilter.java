@@ -34,13 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String token = authHeader.substring(7);
     String username =
-        jwtUtil.extractUsername(token); // Permite cualquier token sin validarlo correctamente
+        jwtUtil.extractUsername(token);
 
     if (username != null) {
       UserDetails userDetails =
           User.withUsername(username)
               .password("")
-              .roles("USER") // Se asigna un rol genérico sin validación
+              .roles("USER")
               .build();
 
       UsernamePasswordAuthenticationToken authentication =

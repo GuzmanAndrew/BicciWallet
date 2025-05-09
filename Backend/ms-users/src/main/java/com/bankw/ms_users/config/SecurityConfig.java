@@ -41,26 +41,17 @@ public class SecurityConfig {
       User user = userOptional.get();
       return org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
           .password(user.getPassword())
-          .roles("USER") // ⚠️ Vulnerabilidad: Todos los usuarios tienen el mismo rol
+          .roles("USER")
           .build();
     };
   }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable()) // ⚠️ CSRF deshabilitado (vulnerabilidad intencional)
-        .headers(
-            headers ->
-                headers.frameOptions(
-                    frameOptions -> frameOptions.disable())) // ✅ Permitir iframes para H2 Console
+    http.csrf(csrf -> csrf.disable())
+        .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers("/h2-console/**", "/webjars/**")
-                    .permitAll() // ✅ Permitir acceso a H2 Console y recursos estáticos
-                    .requestMatchers("/users/**")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated());
+            auth -> auth.requestMatchers("/users/**").permitAll().anyRequest().authenticated());
     return http.build();
   }
 
@@ -68,7 +59,7 @@ public class SecurityConfig {
   public AuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(
-        userDetailsService()); // ✅ Se usa el método `userDetailsService()`
+        userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder());
     return authProvider;
   }

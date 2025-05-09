@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "accounts")
 public class Account {
@@ -15,13 +17,14 @@ public class Account {
   @Column(unique = true, nullable = false)
   private String username;
 
-  private double balance;
+  @Column(precision = 20, scale = 2)
+  private BigDecimal balance;
 
   private String accountType;
 
   public Account() {}
 
-  public Account(Long id, String username, double balance, String accountType) {
+  public Account(Long id, String username, BigDecimal balance, String accountType) {
     this.id = id;
     this.username = username;
     this.balance = balance;
@@ -44,11 +47,11 @@ public class Account {
     this.username = email;
   }
 
-  public double getBalance() {
+  public BigDecimal getBalance() {
     return balance;
   }
 
-  public void setBalance(double balance) {
+  public void setBalance(BigDecimal balance) {
     this.balance = balance;
   }
 

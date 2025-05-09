@@ -14,7 +14,7 @@ import java.util.function.Function;
 public class JwtUtil {
 
   private static final String SECRET_KEY =
-      "CWCG2FIY8pymB+mO51FG2H1wSKv8cSHfucVoZXTT/wg="; // ⚠️ Clave hardcodeada
+      "CWCG2FIY8pymB+mO51FG2H1wSKv8cSHfucVoZXTT/wg=";
 
   private SecretKey getSigningKey() {
     byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);

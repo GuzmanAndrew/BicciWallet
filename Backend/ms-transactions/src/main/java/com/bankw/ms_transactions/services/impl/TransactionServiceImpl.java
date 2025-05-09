@@ -1,11 +1,17 @@
 package com.bankw.ms_transactions.services.impl;
 
 import com.bankw.ms_transactions.config.JwtUtil;
-import com.bankw.ms_transactions.entities.Transaction;
+import com.bankw.ms_transactions.model.dto.PaginatedResponseDto;
+import com.bankw.ms_transactions.model.dto.TransactionDto;
+import com.bankw.ms_transactions.model.entities.Transaction;
 import com.bankw.ms_transactions.repositories.TransactionRepository;
 import com.bankw.ms_transactions.services.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,27 +36,15 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public String processTransaction(
-      HttpServletRequest request, String receiverUsername, Double amount) {
-    // 🔹 Extraemos el token del request
-    String authHeader = request.getHeader("Authorization");
-
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-      return "Error: Token no proporcionado o inválido.";
-    }
-
-    String token = authHeader.substring(7); // Quitamos "Bearer "
-
-    // 🔹 Extraemos el `senderUsername` del token
-    String senderUsername = jwtUtil.extractUsername(token); // ⚠️ No se valida la firma del token
+      HttpServletRequest request, String receiverUsername, BigDecimal amount) {
+    String senderUsername = extractUsernameFromRequest(request);
 
     System.out.println("Procesando transferencia de " + senderUsername);
 
-    // 🔹 Se crea la cabecera con el token
     HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", authHeader);
+    headers.set("Authorization", request.getHeader("Authorization"));
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
-    // 🔹 Consulta saldo del remitente
     String senderBalanceUrl = "http://localhost:8082/accounts/find?username=" + senderUsername;
     ResponseEntity<Map> senderResponse =
         restTemplate.exchange(senderBalanceUrl, HttpMethod.GET, entity, Map.class);
@@ -59,9 +54,10 @@ public class TransactionServiceImpl implements TransactionService {
       return "Error: Cuenta del remitente no encontrada.";
     }
 
-    Double senderBalance = (Double) senderAccount.get("balance");
+    BigDecimal senderBalance = new BigDecimal(senderAccount.get("balance").toString());
+    BigDecimal amountToSend = new BigDecimal(amount.toString());
 
-    if (senderBalance < amount) {
+    if (senderBalance.compareTo(amountToSend) < 0) {
       return "Error: Fondos insuficientes.";
     }
 
@@ -74,7 +70,6 @@ public class TransactionServiceImpl implements TransactionService {
       return "Error: Cuenta del receptor no encontrada.";
     }
 
-    // 🔹 Actualiza saldo del remitente (resta el monto)
     String updateSenderUrl =
         "http://localhost:8082/accounts/update-balance?amount=-"
             + amount
@@ -82,7 +77,6 @@ public class TransactionServiceImpl implements TransactionService {
             + senderUsername;
     restTemplate.exchange(updateSenderUrl, HttpMethod.POST, entity, Void.class);
 
-    // 🔹 Actualiza saldo del receptor (suma el monto)
     String updateReceiverUrl =
         "http://localhost:8082/accounts/update-balance?amount="
             + amount
@@ -90,7 +84,6 @@ public class TransactionServiceImpl implements TransactionService {
             + receiverUsername;
     restTemplate.exchange(updateReceiverUrl, HttpMethod.POST, entity, Void.class);
 
-    // 🔹 Se guarda la transacción
     Transaction transaction = new Transaction();
     transaction.setSenderUsername(senderUsername);
     transaction.setReceiverUsername(receiverUsername);
@@ -101,44 +94,57 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
-  public List<Map<String, Object>> getTransactionHistory(HttpServletRequest request) {
-    // 🔹 Extraemos el token del request
-    String authHeader = request.getHeader("Authorization");
+  public List<TransactionDto> getTransactionHistory(HttpServletRequest request) {
+    String username = extractUsernameFromRequest(request);
 
+    List<Transaction> transactions =
+        transactionRepository.findTop5BySenderUsernameOrReceiverUsernameOrderByTimestampDesc(
+            username, username);
+
+    return formatTransactions(transactions, username);
+  }
+
+  @Override
+  public PaginatedResponseDto<TransactionDto> getAllTransactionsPaginated(
+      HttpServletRequest request, int page, int size) {
+
+    String username = extractUsernameFromRequest(request);
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
+    Page<Transaction> transactionPage =
+        transactionRepository.findBySenderUsernameOrReceiverUsername(username, username, pageable);
+
+    Page<TransactionDto> mappedPage = transactionPage.map(tx -> formatTransaction(tx, username));
+
+    return new PaginatedResponseDto<>(mappedPage);
+  }
+
+  private String extractUsernameFromRequest(HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       throw new RuntimeException("Error: Token no proporcionado o inválido.");
     }
+    return jwtUtil.extractUsername(authHeader.substring(7));
+  }
 
-    String token = authHeader.substring(7); // Quitamos "Bearer "
-    String username = jwtUtil.extractUsername(token);
-
-    List<Transaction> transactions =
-        transactionRepository.findBySenderUsernameOrReceiverUsername(username, username);
-
-    // 🔹 Modifica los montos antes de retornarlos
+  private List<TransactionDto> formatTransactions(List<Transaction> transactions, String username) {
     return transactions.stream()
-        .map(
-            transaction -> {
-              double amount = transaction.getAmount();
-
-              // 🔹 Si el usuario es el remitente, el monto es negativo
-              if (username.equals(transaction.getSenderUsername())) {
-                amount = -amount;
-              }
-
-              // 🔹 Formateamos el monto con signo explícito y 2 decimales
-              String formattedAmount = String.format("%+.2f", amount);
-
-              // 🔹 Retornamos un mapa con los valores corregidos
-              Map<String, Object> transactionMap = new HashMap<>();
-              transactionMap.put("id", transaction.getId());
-              transactionMap.put("senderUsername", transaction.getSenderUsername());
-              transactionMap.put("receiverUsername", transaction.getReceiverUsername());
-              transactionMap.put("amount", formattedAmount);
-              transactionMap.put("timestamp", transaction.getTimestamp());
-
-              return transactionMap;
-            })
+        .map(tx -> formatTransaction(tx, username))
         .collect(Collectors.toList());
+  }
+
+  private TransactionDto formatTransaction(Transaction tx, String username) {
+    BigDecimal amount = tx.getAmount();
+    if (username.equals(tx.getSenderUsername())) {
+      amount = amount.negate();
+    }
+
+    TransactionDto dto = new TransactionDto();
+    dto.setSenderUsername(tx.getSenderUsername());
+    dto.setReceiverUsername(tx.getReceiverUsername());
+    dto.setAmount(amount);
+    dto.setTimestamp(tx.getTimestamp());
+
+    return dto;
   }
 }

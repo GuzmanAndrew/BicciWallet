@@ -12,16 +12,19 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-    return http.csrf(csrf -> csrf.disable()) // CSRF deshabilitado (vulnerabilidad)
+    return http.csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/transactions/transfer", "/transactions/history")
-                    .authenticated()) // Requiere autenticación pero sin validación real
+                auth.requestMatchers(
+                        "/transactions/transfer",
+                        "/transactions/history",
+                        "/transactions/history/all")
+                    .authenticated())
         .addFilterBefore(
             jwtAuthenticationFilter,
             org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-                .class) // Agregamos el filtro inseguro
-        .httpBasic(basic -> basic.disable()) // Deshabilita autenticación básica
+                .class)
+        .httpBasic(basic -> basic.disable())
         .build();
   }
 }

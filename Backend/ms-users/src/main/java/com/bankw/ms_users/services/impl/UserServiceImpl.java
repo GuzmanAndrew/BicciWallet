@@ -2,6 +2,7 @@ package com.bankw.ms_users.services.impl;
 
 import com.bankw.ms_users.config.JwtUtil;
 import com.bankw.ms_users.entities.User;
+import com.bankw.ms_users.exception.UserNotFoundException;
 import com.bankw.ms_users.repositories.UserRepository;
 import com.bankw.ms_users.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +32,13 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Optional<User> login(String username, String password) { // ⚠️ Sin limitación de intentos
+  public Optional<User> login(String username, String password) {
     User user = userRepository.findByUsername(username);
-    if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-      return Optional.of(
-          user);
+    if (user == null) {
+      throw new UserNotFoundException("Usuario no existe");
+    }
+    if (passwordEncoder.matches(password, user.getPassword())) {
+      return Optional.of(user);
     }
     return Optional.empty();
   }

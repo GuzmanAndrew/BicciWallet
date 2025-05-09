@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Collections;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class AccountController {
 
   @PostMapping("/update-balance")
   public ResponseEntity<?> updateBalance(
-      @RequestParam String username, @RequestParam Double amount) {
+      @RequestParam String username, @RequestParam BigDecimal amount) {
     boolean updated = accountService.updateBalance(username, amount);
 
     if (!updated) {
@@ -47,7 +48,7 @@ public class AccountController {
       @RequestHeader("Authorization") String token, @RequestParam String username) {
     try (Connection conn =
             DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/wallet_db", "root", "Andrewseigokan9*");
+                "jdbc:mysql://localhost:3307/wallet_db", "root", "root");
         Statement stmt = conn.createStatement()) {
 
       ResultSet rs = null;

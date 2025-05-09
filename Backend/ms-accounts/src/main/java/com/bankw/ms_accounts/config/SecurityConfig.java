@@ -15,7 +15,10 @@ public class SecurityConfig {
     return http.csrf(csrf -> csrf.disable()) // CSRF deshabilitado (vulnerabilidad)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/accounts/create", "/accounts/find", "/accounts/update-balance")
+                auth.requestMatchers("/accounts/create")
+                    .permitAll()
+                    .requestMatchers(
+                        "/accounts/create", "/accounts/find", "/accounts/update-balance")
                     .authenticated()) // Requiere autenticación pero sin validación real
         .addFilterBefore(
             jwtAuthenticationFilter,

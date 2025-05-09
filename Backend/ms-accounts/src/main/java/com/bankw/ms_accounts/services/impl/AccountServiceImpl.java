@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -31,7 +32,7 @@ public class AccountServiceImpl implements AccountService {
     Account newAccount = new Account();
     newAccount.setUsername(username);
     newAccount.setAccountType("B2C");
-    newAccount.setBalance(0.0);
+    newAccount.setBalance(new BigDecimal("50000.00"));
 
     accountRepository.save(newAccount);
     System.out.println("Cuenta creada para: " + username);
@@ -39,16 +40,16 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public boolean updateBalance(String username, Double amount) {
+  public boolean updateBalance(String username, BigDecimal amount) {
 
     Optional<Account> optionalAccount = accountRepository.findByUsername(username);
 
     if (optionalAccount.isEmpty()) {
-      return false; // ⚠️ No se informa por qué falla (seguridad por oscuridad)
+      return false;
     }
 
     Account account = optionalAccount.get();
-    double newBalance = account.getBalance() + amount;
+    BigDecimal newBalance = account.getBalance().add(amount);
 
     account.setBalance(newBalance);
     accountRepository.save(account);
