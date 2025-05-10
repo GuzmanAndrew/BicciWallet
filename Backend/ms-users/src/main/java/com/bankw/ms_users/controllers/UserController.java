@@ -1,11 +1,12 @@
 package com.bankw.ms_users.controllers;
 
 import com.bankw.ms_users.config.JwtUtil;
-import com.bankw.ms_users.entities.User;
+import com.bankw.ms_users.model.dto.UpdateUserRequestDto;
+import com.bankw.ms_users.model.dto.UserProfileDto;
+import com.bankw.ms_users.model.entities.User;
 import com.bankw.ms_users.exception.UserNotFoundException;
 import com.bankw.ms_users.services.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,15 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
-@RequiredArgsConstructor
 public class UserController {
 
   private final UserService userService;
   private final JwtUtil jwtUtil;
+
+  public UserController(UserService userService, JwtUtil jwtUtil) {
+    this.userService = userService;
+    this.jwtUtil = jwtUtil;
+  }
 
   @PostMapping("/register")
   public User register(@RequestBody User user) {
@@ -30,7 +35,7 @@ public class UserController {
 
   @PostMapping("/login")
   public ResponseEntity<Map<String, String>> login(
-          @RequestParam String username, @RequestParam String password) {
+      @RequestParam String username, @RequestParam String password) {
     try {
       Optional<User> userOptional = userService.login(username, password);
       if (userOptional.isPresent()) {
@@ -38,7 +43,7 @@ public class UserController {
         return ResponseEntity.ok(Collections.singletonMap("token", token));
       } else {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Collections.singletonMap("error", "Invalid credentials"));
+            .body(Collections.singletonMap("error", "Invalid credentials"));
       }
     } catch (UserNotFoundException ex) {
       Map<String, String> error = new HashMap<>();
@@ -48,17 +53,23 @@ public class UserController {
     }
   }
 
-  @PatchMapping("/update-role")
-  public ResponseEntity<Map<String, String>> updateUserRole(
-          @RequestParam String username,
-          @RequestParam String newRole) {
-    return ResponseEntity.ok(userService.updateUserRole(username, newRole));
+  @GetMapping("/profile")
+  public ResponseEntity<UserProfileDto> getProfile(HttpServletRequest request) {
+    String token = request.getHeader("Authorization").substring(7);
+    String username = jwtUtil.extractUsername(token);
+    return ResponseEntity.ok(userService.getUserProfile(username));
+  }
+
+  @PatchMapping("/update")
+  public ResponseEntity<Map<String, String>> updateUser(
+      @RequestHeader("Authorization") String token, @RequestBody UpdateUserRequestDto request) {
+    return ResponseEntity.ok(userService.updateUser(request));
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<String> deleteUser(@RequestParam String username) {
+  public ResponseEntity<String> deleteUser(
+      @RequestHeader("Authorization") String token, @RequestParam String username) {
     userService.deleteByUsername(username);
     return ResponseEntity.ok("Usuario eliminado");
   }
-
 }

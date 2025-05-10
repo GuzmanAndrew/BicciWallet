@@ -16,12 +16,15 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
   private final AccountRepository accountRepository;
-
   private final JwtUtil jwtUtil;
+
+  public AccountServiceImpl(AccountRepository accountRepository, JwtUtil jwtUtil) {
+    this.accountRepository = accountRepository;
+    this.jwtUtil = jwtUtil;
+  }
 
   @Override
   public boolean createAccount(String username) {

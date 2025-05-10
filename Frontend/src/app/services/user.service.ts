@@ -1,50 +1,58 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private apiUrl = 'http://192.168.1.10:8081';
+  private apiUrl = 'http://localhost:8081';
 
   constructor(private http: HttpClient) { }
 
   login(username: string, password: string): Observable<any> {
-    // Para pruebas locales sin backend
-    if (username === 'admin' && password === 'admin') {
-      const mockResponse = { token: 'mock-jwt-token' };
-      localStorage.setItem('token', mockResponse.token);
-      localStorage.setItem('username', username);
-      return of(mockResponse);
-    }
+    const params = new HttpParams()
+      .set('username', username)
+      .set('password', password);
 
-    // Comentado hasta que tengamos el backend conectado
-    // return this.http.post(`${this.apiUrl}/users/login?username=${username}&password=${password}`, {})
-    //   .pipe(
-    //     tap(response => {
-    //       localStorage.setItem('token', response.token);
-    //       localStorage.setItem('username', username);
-    //     }),
-    //     catchError(error => throwError(() => error))
-    //   );
-
-    // Simular un error para cualquier otro usuario
-    return throwError(() => new Error('Usuario no encontrado'));
+    return this.http.post<{ token: string }>(`${this.apiUrl}/users/login`, {}, { params }).pipe(
+      tap((response) => {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('username', username);
+      }),
+      catchError((error) => throwError(() => error))
+    );
   }
 
   register(userData: any): Observable<any> {
-    // Para pruebas locales
-    return of({ id: 1, ...userData });
-
-    // Cuando conectemos el backend:
-    // return this.http.post(`${this.apiUrl}/users/register`, userData);
+    return this.http.post(`${this.apiUrl}/users/register`, userData);
   }
 
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
+  getUserProfile(): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get(`${this.apiUrl}/users/profile`, { headers }).pipe(
+      catchError((error) => throwError(() => error))
+    );
+  }
+
+  updateUserProfile(userData: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Content-Type', 'application/json');
+
+    return this.http.patch(`${this.apiUrl}/users/update`, userData, {
+      headers: headers
+    }).pipe(
+      catchError(error => {
+        console.error('Error al actualizar perfil:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   isLoggedIn(): boolean {

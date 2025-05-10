@@ -11,8 +11,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-  private static final String SECRET_KEY =
-      "CWCG2FIY8pymB+mO51FG2H1wSKv8cSHfucVoZXTT/wg=";
+  private static final String SECRET_KEY = "CWCG2FIY8pymB+mO51FG2H1wSKv8cSHfucVoZXTT/wg=";
 
   private SecretKey getSigningKey() {
     byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
@@ -28,4 +27,12 @@ public class JwtUtil {
         .compact();
   }
 
+  public String extractUsername(String token) {
+    return Jwts.parser()
+        .verifyWith(getSigningKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .getSubject();
+  }
 }

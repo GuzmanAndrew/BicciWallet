@@ -1,4 +1,4 @@
-package com.bankw.ms_transactions.services;
+package com.bankw.ms_transactions.service;
 
 import com.bankw.ms_transactions.model.dto.PaginatedResponseDto;
 import com.bankw.ms_transactions.model.dto.TransactionDto;
@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 public interface TransactionService {
 

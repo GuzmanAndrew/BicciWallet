@@ -1,14 +1,13 @@
-package com.bankw.ms_transactions.services.impl;
+package com.bankw.ms_transactions.service.impl;
 
 import com.bankw.ms_transactions.config.JwtUtil;
+import com.bankw.ms_transactions.exception.BusinessException;
 import com.bankw.ms_transactions.model.dto.PaginatedResponseDto;
 import com.bankw.ms_transactions.model.dto.TransactionDto;
 import com.bankw.ms_transactions.model.entities.Transaction;
-import com.bankw.ms_transactions.repositories.TransactionRepository;
-import com.bankw.ms_transactions.services.TransactionService;
+import com.bankw.ms_transactions.repository.TransactionRepository;
+import com.bankw.ms_transactions.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,53 +20,58 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
   private final TransactionRepository transactionRepository;
   private final RestTemplate restTemplate;
   private final JwtUtil jwtUtil;
 
+  public TransactionServiceImpl(
+      TransactionRepository transactionRepository, RestTemplate restTemplate, JwtUtil jwtUtil) {
+    this.transactionRepository = transactionRepository;
+    this.restTemplate = restTemplate;
+    this.jwtUtil = jwtUtil;
+  }
+
   @Override
   public String processTransaction(
       HttpServletRequest request, String receiverUsername, BigDecimal amount) {
     String senderUsername = extractUsernameFromRequest(request);
-
     System.out.println("Procesando transferencia de " + senderUsername);
 
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", request.getHeader("Authorization"));
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
-    String senderBalanceUrl = "http://localhost:8082/accounts/find?username=" + senderUsername;
+    String senderBalanceUrl = "http://localhost:8082/accounts/v2/balance";
     ResponseEntity<Map> senderResponse =
-        restTemplate.exchange(senderBalanceUrl, HttpMethod.GET, entity, Map.class);
+            restTemplate.exchange(senderBalanceUrl, HttpMethod.GET, entity, Map.class);
     Map senderAccount = senderResponse.getBody();
 
     if (senderAccount == null || !senderAccount.containsKey("balance")) {
-      return "Error: Cuenta del remitente no encontrada.";
+      throw new BusinessException("Cuenta del remitente no encontrada.", "SENDER_NOT_FOUND");
     }
 
     BigDecimal senderBalance = new BigDecimal(senderAccount.get("balance").toString());
-    BigDecimal amountToSend = new BigDecimal(amount.toString());
+    BigDecimal amountToSend = amount;
 
     if (senderBalance.compareTo(amountToSend) < 0) {
-      return "Error: Fondos insuficientes.";
+      throw new BusinessException("Fondos insuficientes.", "INSUFFICIENT_FUNDS");
     }
 
-    String receiverBalanceUrl = "http://localhost:8082/accounts/find?username=" + receiverUsername;
+    String receiverBalanceUrl =
+            "http://localhost:8082/accounts/v1/balance?username=" + receiverUsername;
     ResponseEntity<Map> receiverResponse =
-        restTemplate.exchange(receiverBalanceUrl, HttpMethod.GET, entity, Map.class);
+            restTemplate.exchange(receiverBalanceUrl, HttpMethod.GET, entity, Map.class);
     Map receiverAccount = receiverResponse.getBody();
 
     if (receiverAccount == null) {
-      return "Error: Cuenta del receptor no encontrada.";
+      throw new BusinessException("Cuenta del receptor no encontrada.", "RECEIVER_NOT_FOUND");
     }
 
     String updateSenderUrl =
@@ -115,7 +119,8 @@ public class TransactionServiceImpl implements TransactionService {
             extractUsernameFromRequest(request), extractUsernameFromRequest(request), pageable);
 
     Page<TransactionDto> mappedPage =
-        transactionPage.map(tx -> formatTransaction(tx, extractUsernameFromRequest(request), request));
+        transactionPage.map(
+            tx -> formatTransaction(tx, extractUsernameFromRequest(request), request));
 
     return new PaginatedResponseDto<>(mappedPage);
   }

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
@@ -7,34 +7,47 @@ import { Observable, of } from 'rxjs';
 })
 export class TransactionService {
 
-  private apiUrl = 'http://192.168.1.10:8081'; // Cambiar por la URL real del backend
+  private apiUrl = 'http://localhost:8083';
 
   constructor(private http: HttpClient) { }
 
-  getTransactionHistory(accountId: string): Observable<any[]> {
-    // Para pruebas locales
-    return of([
-      {
-        id: '1',
-        name: 'Fernando Ruiz',
-        date: 'Diciembre 30',
-        amount: 10397000
+  getTransactionHistory(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+
+    return this.http.get<any[]>(`${this.apiUrl}/transactions/history`, {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    ]);
-
-    // Cuando conectemos el backend:
-    // return this.http.get<any[]>(`${this.apiUrl}/ms-transactions/history?accountId=${accountId}`);
-  }
-
-  sendTransaction(data: any): Observable<any> {
-    // Para pruebas locales
-    return of({
-      id: Math.floor(Math.random() * 10000),
-      ...data,
-      status: 'completed'
     });
-
-    // Cuando conectemos el backend:
-    // return this.http.post(`${this.apiUrl}/ms-transactions/send`, data);
   }
+
+  getTransactionHistoryPaginated(page: number, size: number): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    return this.http.get<any>(`${this.apiUrl}/transactions/history/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        page: page.toString(),
+        size: size.toString()
+      }
+    });
+  }
+
+  sendTransaction(data: {
+    receiverUsername: string;
+    amount: number;
+  }): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    const params = {
+      receiverUsername: data.receiverUsername,
+      amount: data.amount.toString()
+    };
+
+    return this.http.post(`${this.apiUrl}/transactions/transfer`, {}, { headers, params });
+  }
+
 }

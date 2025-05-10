@@ -1,6 +1,6 @@
 package com.bankw.ms_users.repositories;
 
-import com.bankw.ms_users.entities.User;
+import com.bankw.ms_users.model.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

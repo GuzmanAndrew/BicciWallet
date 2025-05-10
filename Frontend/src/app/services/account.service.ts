@@ -7,32 +7,22 @@ import { Observable, of } from 'rxjs';
 })
 export class AccountService {
 
-  private apiUrl = 'http://192.168.1.10:8082';
+  private apiUrl = 'http://localhost:8082';
 
   constructor(private http: HttpClient) { }
 
-  createAccount(userId: string): Observable<any> {
-    // Para pruebas locales
-    return of({
-      id: Math.floor(Math.random() * 10000),
-      userId: userId,
-      accountNumber: `4288${Math.floor(Math.random() * 10000000)}`,
-      balance: 1576000
-    });
-
-    // Cuando conectemos el backend:
-    // return this.http.post(`${this.apiUrl}/ms-accounts/create`, { userId });
+  createAccount(username: string): Observable<any> {
+    const params = { username };
+    return this.http.post(`${this.apiUrl}/accounts/create`, {}, { params });
   }
 
-  getAccountDetails(accountId: string): Observable<any> {
-    // Para pruebas locales
-    return of({
-      id: accountId,
-      accountNumber: '4288',
-      balance: 1576000
+  getAccountDetailsSecure(): Observable<any> {
+    const token = localStorage.getItem('token');
+    return this.http.get(`${this.apiUrl}/accounts/v2/balance`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
-
-    // Cuando conectemos el backend:
-    // return this.http.get(`${this.apiUrl}/ms-accounts/find?accountId=${accountId}`);
   }
+
 }

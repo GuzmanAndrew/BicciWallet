@@ -17,7 +17,8 @@ export class RegisterUserComponent {
     name: '',
     username: '',
     email: '',
-    password: ''
+    password: '',
+    role: 'b2c'
   };
 
   showPassword = false;
@@ -45,19 +46,16 @@ export class RegisterUserComponent {
       return;
     }
 
-    // Validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.userData.email)) {
       this.errorMessage = 'Por favor ingresa un correo electrónico válido';
       return;
     }
 
-    // Por ahora, simulamos el registro exitoso
     this.userService.register(this.userData)
       .subscribe({
         next: (response) => {
           console.log('Usuario registrado exitosamente', response);
-          // Guardar datos de usuario para la siguiente pantalla
           localStorage.setItem('registeredUser', JSON.stringify(this.userData));
           this.router.navigate(['/register-account']);
         },

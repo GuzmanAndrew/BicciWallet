@@ -4,7 +4,7 @@ spring:
   application:
     name: ms-users
   datasource:
-    url: jdbc:mysql://mysql:3306/wallet_db
+    url: jdbc:mysql://localhost:3307/wallet_db
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver

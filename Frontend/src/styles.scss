@@ -64,3 +64,25 @@ body {
    border-radius: 8px;
    font-size: 16px;
 }
+
+.swal2-popup {
+   font-family: 'Tu fuente', sans-serif;
+   border-radius: 8px;
+}
+
+.swal2-title {
+   color: #333;
+}
+
+.swal2-confirm {
+   border-radius: 4px !important;
+   text-transform: uppercase;
+   font-weight: 500;
+   padding: 8px 24px !important;
+}
+
+.transfer-id {
+   font-size: 14px;
+   color: #757575;
+   margin-top: 12px;
+}

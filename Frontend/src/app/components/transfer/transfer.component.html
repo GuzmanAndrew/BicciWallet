@@ -4,7 +4,7 @@
       <div class="sidebar-header">
          <div class="logo-container">
             <img src="assets/images/wallet_logo.png" alt="NeoBank Logo" class="logo">
-            <h1 class="brand-name">Web Wallet</h1>
+            <h1 class="brand-name">Bicci Wallet</h1>
          </div>
       </div>
 
@@ -18,24 +18,7 @@
             <span>Inicio</span>
          </a>
 
-         <!-- <a class="menu-item active">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2">
-               <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-               <line x1="2" y1="10" x2="22" y2="10"></line>
-            </svg>
-            <span>Wallet</span>
-         </a>
-
-         <a class="menu-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2">
-               <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"></path>
-            </svg>
-            <span>Actividad</span>
-         </a> -->
-
-         <a class="menu-item">
+         <a class="menu-item" [routerLink]="['/profile']">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="2">
                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -44,7 +27,7 @@
             <span>Perfil</span>
          </a>
 
-         <a class="menu-item logout">
+         <a class="menu-item logout" (click)="logout()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="2">
                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -62,7 +45,7 @@
          <h1 class="page-title">Nueva Transferencia</h1>
          <div class="user-info">
             <span class="welcome">Bienvenido, </span>
-            <span class="username">Usuario</span>
+            <span class="username">{{ username }}</span>
          </div>
       </div>
 
@@ -83,30 +66,16 @@
                   <div class="amount-input">
                      <span class="currency-symbol">$</span>
                      <input type="text" id="amount" class="form-input" [(ngModel)]="transferData.amount"
-                        placeholder="1,576,000">
+                        placeholder="0">
                   </div>
                </div>
 
                <div class="form-group">
                   <label>¿A quién vas a transferir?</label>
-                  <div class="recipient-card">
-                     <div class="recipient-avatar">
-                        <div class="avatar-placeholder"></div>
-                     </div>
-                     <div class="recipient-info">
-                        <p class="recipient-name">Alejandro Fernandez</p>
-                        <p class="recipient-id">ID: 75632</p>
-                     </div>
-                     <button class="change-recipient-button">
-                        Cambiar
-                     </button>
+                  <div class="form-group">
+                     <input type="text" id="recipient" class="form-input" [(ngModel)]="transferData.recipientUsername"
+                        placeholder="Nombre del destinatario">
                   </div>
-               </div>
-
-               <div class="form-group">
-                  <label for="description">Descripción (Opcional)</label>
-                  <textarea id="description" class="form-input textarea" [(ngModel)]="transferData.description"
-                     placeholder="Ingresa una descripción para esta transferencia" rows="3"></textarea>
                </div>
 
                <div class="button-container">
@@ -114,7 +83,7 @@
                      Cancelar
                   </button>
                   <button class="transfer-button" (click)="makeTransfer()">
-                     TRANSFERIR
+                     Transferir
                   </button>
                </div>
             </div>
@@ -130,7 +99,7 @@
 
                <div class="summary-item">
                   <span class="summary-label">A</span>
-                  <span class="summary-value">Alejandro Fernandez</span>
+                  <span class="summary-value">{{transferData.recipientUsername}}</span>
                </div>
 
                <div class="summary-item">
@@ -140,7 +109,7 @@
 
                <div class="summary-item">
                   <span class="summary-label">Fecha</span>
-                  <span class="summary-value">{{currentDate | date:'medium'}}</span>
+                  <span class="summary-value">{{ now | date:'medium' }}</span>
                </div>
 
                <div class="account-info">
@@ -150,39 +119,10 @@
                         <p class="balance-label">Saldo disponible</p>
                         <p class="balance-amount">${{accountBalance}}</p>
                      </div>
-                     <p class="account-number">•••• 4288</p>
                   </div>
                </div>
             </div>
          </div>
-      </div>
-   </div>
-</div>
-
-<!-- Success Dialog -->
-<div class="dialog-overlay" *ngIf="showSuccessDialog">
-   <div class="dialog">
-      <div class="dialog-header">
-         <div class="success-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-               stroke="#4CAF50" stroke-width="2">
-               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-               <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-         </div>
-         <h2 class="dialog-title">¡Transferencia Exitosa!</h2>
-      </div>
-
-      <div class="dialog-content">
-         <p>Tu transferencia por <strong>${{transferData.amount}}</strong> a <strong>Alejandro Fernandez</strong> ha
-            sido realizada con éxito.</p>
-         <p class="transfer-id">ID de Transferencia: #{{generateTransactionId()}}</p>
-      </div>
-
-      <div class="dialog-actions">
-         <button class="dialog-button" (click)="closeSuccessDialog()">
-            CERRAR
-         </button>
       </div>
    </div>
 </div>

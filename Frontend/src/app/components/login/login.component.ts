@@ -32,8 +32,6 @@ export class LoginComponent {
       return;
     }
 
-    // Por ahora, simulamos la validación, en una etapa posterior
-    // lo conectaremos con el backend real
     this.userService.login(this.username, this.password)
       .subscribe({
         next: (response) => {
@@ -42,7 +40,6 @@ export class LoginComponent {
         },
         error: (error) => {
           console.error('Error en login', error);
-          // Simular que el usuario no existe
           this.router.navigate(['/user-not-found']);
         }
       });

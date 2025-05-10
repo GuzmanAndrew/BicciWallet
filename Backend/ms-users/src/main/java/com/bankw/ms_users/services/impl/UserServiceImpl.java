@@ -1,10 +1,12 @@
 package com.bankw.ms_users.services.impl;
 
-import com.bankw.ms_users.entities.User;
+import com.bankw.ms_users.model.dto.UpdateUserRequestDto;
+import com.bankw.ms_users.model.dto.UserProfileDto;
+import com.bankw.ms_users.model.entities.User;
 import com.bankw.ms_users.exception.UserNotFoundException;
 import com.bankw.ms_users.repositories.UserRepository;
 import com.bankw.ms_users.services.UserService;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +15,15 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+
+  public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
 
   @Override
   public User register(User user) {
@@ -38,26 +44,62 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Map<String, String> updateUserRole(String username, String newRole) {
+  public Map<String, String> updateUser(UpdateUserRequestDto request) {
+    if (request.getUsername() == null || request.getUsername().isBlank()) {
+      throw new IllegalArgumentException("El campo 'username' es obligatorio.");
+    }
+
+    Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
+    if (optionalUser.isEmpty()) {
+      throw new UserNotFoundException("Usuario no encontrado");
+    }
+
+    User user = optionalUser.get();
+
+    if (request.getName() != null && !request.getName().isBlank()) {
+      user.setName(request.getName());
+    }
+
+    if (request.getPassword() != null && !request.getPassword().isBlank()) {
+      user.setPassword(passwordEncoder.encode(request.getPassword()));
+    }
+
+    if (request.getRole() != null && !request.getRole().isBlank()) {
+      user.setRole(request.getRole());
+    }
+
+    if (request.getEmail() != null && !request.getEmail().isBlank()) {
+      user.setEmail(request.getEmail());
+    }
+
+    userRepository.save(user);
+
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "Usuario actualizado exitosamente");
+    response.put("username", user.getUsername());
+
+    return response;
+  }
+
+  @Override
+  @Transactional
+  public void deleteByUsername(String username) {
+    userRepository.deleteByUsername(username);
+  }
+
+  @Override
+  public UserProfileDto getUserProfile(String username) {
     Optional<User> optionalUser = userRepository.findByUsername(username);
     if (optionalUser.isEmpty()) {
       throw new UserNotFoundException("Usuario no encontrado");
     }
 
     User user = optionalUser.get();
-    user.setRole(newRole);
-    userRepository.save(user);
-
-    Map<String, String> response = new HashMap<>();
-    response.put("message", "Rol actualizado exitosamente");
-    response.put("username", username);
-    response.put("newRole", newRole);
-
-    return response;
-  }
-
-  @Override
-  public void deleteByUsername(String username) {
-    userRepository.deleteByUsername(username);
+    return new UserProfileDto(
+            user.getName(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getRole()
+    );
   }
 }

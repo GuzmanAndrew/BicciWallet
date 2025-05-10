@@ -1,4 +1,4 @@
-package com.bankw.ms_transactions.repositories;
+package com.bankw.ms_transactions.repository;
 
 import com.bankw.ms_transactions.model.entities.Transaction;
 import org.springframework.data.domain.Page;

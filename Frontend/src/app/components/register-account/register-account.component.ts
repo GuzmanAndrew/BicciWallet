@@ -22,7 +22,6 @@ export class RegisterAccountComponent {
   ) { }
 
   ngOnInit() {
-    // Recuperar datos del usuario registrado
     const userData = localStorage.getItem('registeredUser');
     if (userData) {
       this.registeredUser = JSON.parse(userData);
@@ -43,18 +42,19 @@ export class RegisterAccountComponent {
 
     this.isLoading = true;
 
-    // Simulamos la creación de cuenta bancaria
-    setTimeout(() => {
-      // En un caso real, esto llamaría al servicio:
-      // this.accountService.createAccount(this.registeredUser.id)
-
-      this.isLoading = false;
-
-      // Limpiamos datos temporales
-      localStorage.removeItem('registeredUser');
-
-      // Redirigimos al login
-      this.router.navigate(['/login']);
-    }, 1500); // Simulamos un retardo para mostrar el spinner
+    this.accountService.createAccount(this.registeredUser.username)
+      .subscribe({
+        next: (response) => {
+          console.log('Cuenta bancaria creada exitosamente', response);
+          this.isLoading = false;
+          localStorage.removeItem('registeredUser');
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.error('Error al crear la cuenta', error);
+          this.isLoading = false;
+          this.errorMessage = 'Ocurrió un error al crear tu cuenta bancaria.';
+        }
+      });
   }
 }
