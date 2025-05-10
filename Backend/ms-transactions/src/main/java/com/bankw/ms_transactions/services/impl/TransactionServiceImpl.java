@@ -7,6 +7,7 @@ import com.bankw.ms_transactions.model.entities.Transaction;
 import com.bankw.ms_transactions.repositories.TransactionRepository;
 import com.bankw.ms_transactions.services.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,13 +27,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
-  @Autowired private TransactionRepository transactionRepository;
-
-  @Autowired private RestTemplate restTemplate;
-
-  @Autowired private JwtUtil jwtUtil;
+  private final TransactionRepository transactionRepository;
+  private final RestTemplate restTemplate;
+  private final JwtUtil jwtUtil;
 
   @Override
   public String processTransaction(
@@ -101,22 +101,28 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.findTop5BySenderUsernameOrReceiverUsernameOrderByTimestampDesc(
             username, username);
 
-    return formatTransactions(transactions, username);
+    return formatTransactions(transactions, username, request);
   }
 
   @Override
   public PaginatedResponseDto<TransactionDto> getAllTransactionsPaginated(
       HttpServletRequest request, int page, int size) {
 
-    String username = extractUsernameFromRequest(request);
-
     Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
-    Page<Transaction> transactionPage =
-        transactionRepository.findBySenderUsernameOrReceiverUsername(username, username, pageable);
 
-    Page<TransactionDto> mappedPage = transactionPage.map(tx -> formatTransaction(tx, username));
+    Page<Transaction> transactionPage =
+        transactionRepository.findBySenderUsernameOrReceiverUsername(
+            extractUsernameFromRequest(request), extractUsernameFromRequest(request), pageable);
+
+    Page<TransactionDto> mappedPage =
+        transactionPage.map(tx -> formatTransaction(tx, extractUsernameFromRequest(request), request));
 
     return new PaginatedResponseDto<>(mappedPage);
+  }
+
+  @Override
+  public String getForObject(String url) {
+    return restTemplate.getForObject(url, String.class);
   }
 
   private String extractUsernameFromRequest(HttpServletRequest request) {
@@ -127,13 +133,15 @@ public class TransactionServiceImpl implements TransactionService {
     return jwtUtil.extractUsername(authHeader.substring(7));
   }
 
-  private List<TransactionDto> formatTransactions(List<Transaction> transactions, String username) {
+  private List<TransactionDto> formatTransactions(
+      List<Transaction> transactions, String username, HttpServletRequest request) {
     return transactions.stream()
-        .map(tx -> formatTransaction(tx, username))
+        .map(tx -> formatTransaction(tx, username, request))
         .collect(Collectors.toList());
   }
 
-  private TransactionDto formatTransaction(Transaction tx, String username) {
+  private TransactionDto formatTransaction(
+      Transaction tx, String username, HttpServletRequest request) {
     BigDecimal amount = tx.getAmount();
     if (username.equals(tx.getSenderUsername())) {
       amount = amount.negate();
@@ -144,6 +152,8 @@ public class TransactionServiceImpl implements TransactionService {
     dto.setReceiverUsername(tx.getReceiverUsername());
     dto.setAmount(amount);
     dto.setTimestamp(tx.getTimestamp());
+
+    dto.setRawToken(request.getHeader("Authorization"));
 
     return dto;
   }

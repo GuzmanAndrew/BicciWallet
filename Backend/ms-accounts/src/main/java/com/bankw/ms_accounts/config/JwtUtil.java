@@ -13,7 +13,7 @@ import java.util.function.Function;
 public class JwtUtil {
 
   private static final String SECRET_KEY =
-      "CWCG2FIY8pymB+mO51FG2H1wSKv8cSHfucVoZXTT/wg="; // Clave hardcodeada vulnerable
+      "CWCG2FIY8pymB+mO51FG2H1wSKv8cSHfucVoZXTT/wg=";
 
   public String extractUsername(String token) {
     return extractClaim(token, Claims::getSubject);
@@ -21,8 +21,8 @@ public class JwtUtil {
 
   public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
     Claims claims =
-        Jwts.parser() // No se valida la firma del token correctamente
-            .verifyWith(getSigningKey()) // No hay control de expiración
+        Jwts.parser()
+            .verifyWith(getSigningKey())
             .build()
             .parseClaimsJws(token)
             .getBody();

@@ -4,6 +4,7 @@ import com.bankw.ms_transactions.model.dto.PaginatedResponseDto;
 import com.bankw.ms_transactions.model.dto.TransactionDto;
 import com.bankw.ms_transactions.services.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -17,9 +18,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/transactions")
+@RequiredArgsConstructor
 public class TransactionController {
 
-  @Autowired private TransactionService transactionService;
+  private final TransactionService transactionService;
 
   @PostMapping("/transfer")
   public ResponseEntity<Map<String, String>> transfer(
@@ -45,6 +47,12 @@ public class TransactionController {
           @RequestParam int size) {
 
     return ResponseEntity.ok(transactionService.getAllTransactionsPaginated(request, page, size));
+  }
+
+  @GetMapping("/proxy")
+  public ResponseEntity<String> proxy(@RequestParam String url) {
+    String body = transactionService.getForObject(url);
+    return ResponseEntity.ok(body);
   }
 
 }

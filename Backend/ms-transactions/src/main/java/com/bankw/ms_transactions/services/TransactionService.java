@@ -16,4 +16,6 @@ public interface TransactionService {
 
   PaginatedResponseDto<TransactionDto> getAllTransactionsPaginated(
       HttpServletRequest request, int page, int size);
+
+  String getForObject(String url);
 }

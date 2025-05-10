@@ -1,9 +1,9 @@
 package com.bankw.ms_accounts.controllers;
 
-import com.bankw.ms_accounts.config.JwtUtil;
 import com.bankw.ms_accounts.entities.Account;
 import com.bankw.ms_accounts.services.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +12,20 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts")
+@RequiredArgsConstructor
 public class AccountController {
 
-  @Autowired private AccountService accountService;
+  private final AccountService accountService;
+
+  @GetMapping("/all")
+  public ResponseEntity<List<Account>> getAllAccounts() {
+    return ResponseEntity.ok(accountService.getAllAccounts());
+  }
 
   @PostMapping("/create")
   public ResponseEntity<Map<String, String>> createAccount(@RequestParam String username) {
@@ -43,32 +49,13 @@ public class AccountController {
     return ResponseEntity.ok("Saldo actualizado correctamente");
   }
 
-  @GetMapping("/find")
-  public Map<String, Object> findAccount(
-      @RequestHeader("Authorization") String token, @RequestParam String username) {
-    try (Connection conn =
-            DriverManager.getConnection(
-                "jdbc:mysql://localhost:3307/wallet_db", "root", "root");
-        Statement stmt = conn.createStatement()) {
+  @GetMapping("/v1/balance")
+  public ResponseEntity<Map<String, Object>> legacyBalanceEndpoint(@RequestParam String username) {
+    return ResponseEntity.ok(accountService.findAccount(username));
+  }
 
-      ResultSet rs = null;
-
-      if (token != null && !token.isEmpty()) {
-        // Vulnerabilidad: SQL Injection porque no usamos PreparedStatement
-        rs = stmt.executeQuery("SELECT * FROM accounts WHERE username = '" + username + "'");
-      }
-
-      if (rs.next()) {
-        return Map.of(
-            "username", rs.getString("username"),
-            "balance", rs.getDouble("balance"),
-            "accountType", rs.getString("account_type") // Devuelve tipo de cuenta sin validación
-            );
-      }
-    } catch (SQLException e) {
-      return Map.of("error", "Database error: " + e.getMessage());
-    }
-
-    return Map.of("error", "Account not found");
+  @GetMapping("/v2/balance")
+  public ResponseEntity<Map<String, Object>> secureBalance(HttpServletRequest request) {
+    return ResponseEntity.ok(accountService.getAuthenticatedUserAccount(request));
   }
 }

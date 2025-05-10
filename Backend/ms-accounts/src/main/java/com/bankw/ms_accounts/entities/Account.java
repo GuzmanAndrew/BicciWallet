@@ -1,13 +1,19 @@
 package com.bankw.ms_accounts.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "accounts")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Account {
 
   @Id
@@ -22,44 +28,4 @@ public class Account {
 
   private String accountType;
 
-  public Account() {}
-
-  public Account(Long id, String username, BigDecimal balance, String accountType) {
-    this.id = id;
-    this.username = username;
-    this.balance = balance;
-    this.accountType = accountType;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String email) {
-    this.username = email;
-  }
-
-  public BigDecimal getBalance() {
-    return balance;
-  }
-
-  public void setBalance(BigDecimal balance) {
-    this.balance = balance;
-  }
-
-  public String getAccountType() {
-    return accountType;
-  }
-
-  public void setAccountType(String accountType) {
-    this.accountType = accountType;
-  }
 }
