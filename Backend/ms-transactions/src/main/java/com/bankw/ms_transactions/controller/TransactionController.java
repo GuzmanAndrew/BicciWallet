@@ -25,7 +25,6 @@ public class TransactionController {
 
   @PostMapping("/transfer")
   public ResponseEntity<Map<String, String>> transfer(
-      @RequestHeader("Authorization") String token,
       HttpServletRequest request,
       @RequestParam String receiverUsername,
       @RequestParam BigDecimal amount) {
