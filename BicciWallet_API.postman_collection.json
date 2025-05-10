@@ -1,0 +1,502 @@
+{
+	"info": {
+		"_postman_id": "c3515928-734a-4248-beab-9ea9524fe808",
+		"name": "AppBankVuln",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8656105"
+	},
+	"item": [
+		{
+			"name": "ms-users",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Steeve Guzman\",\r\n    \"username\": \"steeveguzman\",\r\n    \"email\": \"steeveguzman@test.com\",\r\n    \"password\": \"1234\",\r\n    \"role\": \"user\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users/login?username=steeveguzman&password=1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "steeveguzman"
+								},
+								{
+									"key": "password",
+									"value": "1234"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTc0Njg2OTU1NCwiZXhwIjoxNzQ2OTU1OTU0fQ.uA7sQ-lT39gm6YN1Q34_WqLIelQPrPX_73i80lW1mkw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"test1\",\r\n    \"name\": \"\",\r\n    \"password\": \"\",\r\n    \"role\": \"\",\r\n    \"email\": \"test11@test.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTc0Njg2OTU1NCwiZXhwIjoxNzQ2OTU1OTU0fQ.uA7sQ-lT39gm6YN1Q34_WqLIelQPrPX_73i80lW1mkw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/users/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTc0Njg2OTU1NCwiZXhwIjoxNzQ2OTU1OTU0fQ.uA7sQ-lT39gm6YN1Q34_WqLIelQPrPX_73i80lW1mkw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/users/delete?username=test2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "test2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ms-accounts",
+			"item": [
+				{
+					"name": "Create Account",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/accounts/create?username=steeveguzman",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"accounts",
+								"create"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "steeveguzman"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Balance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYW1pcmV6c3RlZXZlIiwiaWF0IjoxNzQ2MjEyMDE3LCJleHAiOjE3NDYyOTg0MTd9.bLbzyh22H8i1Jytxt53rkc3F_YdI0-h58oDREkznSSQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/accounts/update-balance?amount=60&username=ramirezsteeve",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"accounts",
+								"update-balance"
+							],
+							"query": [
+								{
+									"key": "amount",
+									"value": "60"
+								},
+								{
+									"key": "username",
+									"value": "ramirezsteeve"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Account V1",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdGVldmVndXptYW4iLCJpYXQiOjE3NDY3OTg3MDYsImV4cCI6MTc0Njg4NTEwNn0.Wy8gmyeBc9ZUEGB4VCQlmZ8uitMexPs5PhyqMzFq5Ns",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/accounts/v1/balance?username=steeveguzman",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"accounts",
+								"v1",
+								"balance"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "steeveguzman"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Account V2",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdGVldmVndXptYW4iLCJpYXQiOjE3NDY4NjE0MzEsImV4cCI6MTc0Njk0NzgzMX0.X7vaJxhDWAbpBk3SKcqTFTsZ9a33bL2z7fxO1EZzICQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/accounts/v2/balance",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"accounts",
+								"v2",
+								"balance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Accounts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/accounts/all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"accounts",
+								"all"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ms-transactions",
+			"item": [
+				{
+					"name": "Send Transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXdyYW1pcmV6IiwiaWF0IjoxNzQ2ODY1NjM5LCJleHAiOjE3NDY5NTIwMzl9.KMQQV3k36CJKSN2Llhwv2m9KbUdbACphNx5FeI7cB0o",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/transactions/transfer?receiverUsername=steeveguzman&amount=20000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"transactions",
+								"transfer"
+							],
+							"query": [
+								{
+									"key": "receiverUsername",
+									"value": "steeveguzman"
+								},
+								{
+									"key": "amount",
+									"value": "20000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "History Transactions Filter 5",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdGVldmVndXptYW4iLCJpYXQiOjE3NDY4NjE0MzEsImV4cCI6MTc0Njk0NzgzMX0.X7vaJxhDWAbpBk3SKcqTFTsZ9a33bL2z7fxO1EZzICQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/transactions/history",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"transactions",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "History Transactions All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdGVldmVndXptYW4iLCJpYXQiOjE3NDY4MDA1NzEsImV4cCI6MTc0Njg4Njk3MX0.aVV3dd823R1RO7ubYQWLsUCowrEG1yMaDYhieDSVmuY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/transactions/history/all?page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"transactions",
+								"history",
+								"all"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Proxy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdGVldmVndXptYW4iLCJpYXQiOjE3NDY4MDA1NzEsImV4cCI6MTc0Njg4Njk3MX0.aVV3dd823R1RO7ubYQWLsUCowrEG1yMaDYhieDSVmuY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/transactions/proxy?url=https://guzmanandrew.github.io/Portafolio/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"transactions",
+								"proxy"
+							],
+							"query": [
+								{
+									"key": "url",
+									"value": "https://guzmanandrew.github.io/Portafolio/"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -77,10 +77,28 @@ git clone https://github.com/your-org/BicciWallet.git
 cd BicciWallet/Backend
 ```
 
-### 2. Run the backend (microservices + DB)
+### 2. Run the application
+#### Option 1: Using Docker Compose (Recommended)
 
 ```bash
+cd Backend
 docker-compose up --build
+```
+#### Option 2: Using the deploy script
+
+```bash
+# Make the script executable (only needed once)
+chmod +x deploy.sh
+
+# Run the deploy script
+./deploy.sh
+```
+
+#### To stop all containers:
+
+```bash
+cd Backend
+docker-compose down
 ```
 
 ### 3. Test APIs
