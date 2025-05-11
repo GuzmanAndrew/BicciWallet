@@ -26,7 +26,3 @@ cd Backend
 docker-compose up -d --build
 
 echo "✅ Web Wallet desplegada en http://localhost"
-echo "📝 Microservicios desplegados en:"
-echo "   - Users: http://localhost:8081"
-echo "   - Accounts: http://localhost:8082"
-echo "   - Transactions: http://localhost:8083"
