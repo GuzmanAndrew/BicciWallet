@@ -4,6 +4,7 @@ import com.bankw.ms_transactions.model.dto.PaginatedResponseDto;
 import com.bankw.ms_transactions.model.dto.TransactionDto;
 import com.bankw.ms_transactions.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +16,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/transactions")
+@RequiredArgsConstructor
 public class TransactionController {
 
   private final TransactionService transactionService;
-
-  public TransactionController(TransactionService transactionService) {
-    this.transactionService = transactionService;
-  }
 
   @PostMapping("/transfer")
   public ResponseEntity<Map<String, String>> transfer(

@@ -8,6 +8,7 @@ import com.bankw.ms_transactions.model.entities.Transaction;
 import com.bankw.ms_transactions.repository.TransactionRepository;
 import com.bankw.ms_transactions.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,18 +26,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
   private final TransactionRepository transactionRepository;
   private final RestTemplate restTemplate;
   private final JwtUtil jwtUtil;
-
-  public TransactionServiceImpl(
-      TransactionRepository transactionRepository, RestTemplate restTemplate, JwtUtil jwtUtil) {
-    this.transactionRepository = transactionRepository;
-    this.restTemplate = restTemplate;
-    this.jwtUtil = jwtUtil;
-  }
 
   @Override
   public String processTransaction(

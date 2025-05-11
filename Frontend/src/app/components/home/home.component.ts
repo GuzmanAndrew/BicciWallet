@@ -1,9 +1,11 @@
-import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { isPlatformBrowser, NgClass, NgFor, NgIf } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AccountService } from '../../services/account.service';
 import { TransactionService } from '../../services/transaction.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +14,7 @@ import Swal from 'sweetalert2';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
   Math = Math;
 
@@ -35,15 +37,20 @@ export class HomeComponent {
   }[] = [];
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
     private accountService: AccountService,
-    private transactionService: TransactionService
+    private transactionService: TransactionService,
+    private authService: AuthService,
+    private userService: UserService
   ) { }
 
   ngOnInit() {
-    this.username = localStorage.getItem('username') || 'Usuario';
-    this.loadAccountDetails();
-    this.loadTransactions();
+    if (isPlatformBrowser(this.platformId)) {
+      this.username = this.authService.getUsername() || 'Usuario';
+      this.loadAccountDetails();
+      this.loadTransactions();
+    }
   }
 
   loadAccountDetails() {
@@ -60,7 +67,7 @@ export class HomeComponent {
   loadTransactions() {
     this.transactionService.getTransactionHistory().subscribe({
       next: (transactions) => {
-        const currentUser = localStorage.getItem('username');
+        const currentUser = this.authService.getUsername();
         this.transactions = transactions.map(tx => {
           const isIncoming = tx.receiverUsername === currentUser;
           const amount = isIncoming ? Math.abs(tx.amount) : -Math.abs(tx.amount);
@@ -106,8 +113,7 @@ export class HomeComponent {
       cancelButtonColor: '#757575'
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
+        this.userService.logout();
         this.router.navigate(['/']).then(() => {
           Swal.fire({
             title: 'Sesión cerrada',

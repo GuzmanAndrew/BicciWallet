@@ -108,12 +108,6 @@
                <small class="form-text">Deja en blanco para mantener la contraseña actual</small>
             </div>
 
-            <div class="form-group">
-               <label for="role">Rol</label>
-               <input type="text" id="role" formControlName="role" class="form-control" readonly>
-               <small class="form-text">El rol del usuario no puede ser modificado</small>
-            </div>
-
             <div class="form-actions">
                <button type="button" class="cancel-button" (click)="navigateToHome()">Cancelar</button>
                <button type="submit" class="save-button" [disabled]="profileForm.invalid">Guardar Cambios</button>

@@ -2,6 +2,7 @@ package com.bankw.ms_users.config;
 
 import com.bankw.ms_users.model.entities.User;
 import com.bankw.ms_users.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,13 +26,10 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
   private final UserRepository userRepository;
-
-  public SecurityConfig(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -55,8 +53,7 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable())
         .headers(headers -> headers.frameOptions(frame -> frame.disable()))
         .authorizeHttpRequests(
@@ -73,8 +70,15 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+    configuration.setAllowedOrigins(
+        Arrays.asList(
+            "http://localhost:4200",
+            "http://localhost:4000",
+            "http://frontend:4000",
+            "http://nginx-proxy:4200"));
+
+    configuration.setAllowedMethods(
+        Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     configuration.setAllowedHeaders(Arrays.asList("*"));
     configuration.setAllowCredentials(true);
 

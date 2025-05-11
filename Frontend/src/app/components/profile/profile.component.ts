@@ -1,9 +1,10 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -12,7 +13,7 @@ import { UserService } from '../../services/user.service';
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
 
   username: string = '';
   profileForm: FormGroup;
@@ -20,34 +21,35 @@ export class ProfileComponent {
   showPassword: boolean = false;
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private fb: FormBuilder,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService
   ) {
     this.profileForm = this.fb.group({
       username: [{ value: '', disabled: true }],
       name: [''],
       email: ['', [Validators.email]],
-      password: [''],
-      role: [{ value: '', disabled: true }]
+      password: ['']
     });
   }
 
   ngOnInit(): void {
-    this.username = localStorage.getItem('username') || 'Usuario';
-    this.loadUserProfile();
+    if (isPlatformBrowser(this.platformId)) {
+      this.username = this.authService.getUsername() || 'Usuario';
+      this.loadUserProfile();
+    }
   }
 
   loadUserProfile(): void {
     this.isLoading = true;
     this.userService.getUserProfile().subscribe({
       next: (userData) => {
-        // Rellenar el formulario con los datos del usuario
         this.profileForm.patchValue({
           username: userData.username,
           name: userData.name || '',
-          email: userData.email || '',
-          role: userData.role || ''
+          email: userData.email || ''
         });
         this.isLoading = false;
       },
@@ -79,8 +81,7 @@ export class ProfileComponent {
       username: this.username,
       name: this.profileForm.get('name')?.value,
       email: this.profileForm.get('email')?.value,
-      password: this.profileForm.get('password')?.value || '',
-      role: this.profileForm.get('role')?.value
+      password: this.profileForm.get('password')?.value || ''
     };
 
     this.isLoading = true;
@@ -93,11 +94,6 @@ export class ProfileComponent {
           confirmButtonText: 'Excelente'
         });
         this.isLoading = false;
-
-        // Actualizar el email en localStorage si cambió
-        if (userData.email && userData.email !== '') {
-          localStorage.setItem('email', userData.email);
-        }
       },
       error: (error) => {
         console.error('Error al actualizar perfil:', error);
@@ -132,8 +128,7 @@ export class ProfileComponent {
       cancelButtonColor: '#757575'
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
+        this.userService.logout();
         this.router.navigate(['/']).then(() => {
           Swal.fire({
             title: 'Sesión cerrada',

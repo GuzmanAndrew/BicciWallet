@@ -1,7 +1,9 @@
 import { NgFor } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
+import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-support',
@@ -10,7 +12,7 @@ import Swal from 'sweetalert2';
   templateUrl: './support.component.html',
   styleUrl: './support.component.scss'
 })
-export class SupportComponent {
+export class SupportComponent implements OnInit {
 
   username: string = '';
 
@@ -33,10 +35,14 @@ export class SupportComponent {
     }
   ];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private userService: UserService
+  ) { }
 
   ngOnInit() {
-    this.username = localStorage.getItem('username') || 'Usuario';
+    this.username = this.authService.getUsername() || 'Usuario';
   }
 
   logout() {
@@ -51,8 +57,7 @@ export class SupportComponent {
       cancelButtonColor: '#757575'
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
+        this.userService.logout();
         this.router.navigate(['/']).then(() => {
           Swal.fire({
             title: 'Sesión cerrada',

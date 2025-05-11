@@ -18,13 +18,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts")
+@RequiredArgsConstructor
 public class AccountController {
 
   private final AccountService accountService;
-
-  public AccountController(AccountService accountService) {
-    this.accountService = accountService;
-  }
 
   @GetMapping("/all")
   public ResponseEntity<List<Account>> getAllAccounts() {

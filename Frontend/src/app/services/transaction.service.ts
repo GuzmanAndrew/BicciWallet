@@ -1,20 +1,25 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionService {
 
-  private apiUrl = '/api/transactions';
+  //private apiUrl = '/api/transactions';
+  private apiUrl = 'http://localhost:8083/api/transactions';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   getTransactionHistory(): Observable<any[]> {
-    const token = localStorage.getItem('token');
+    const token = this.authService.getToken();
 
-    return this.http.get<any[]>(`${this.apiUrl}/transactions/history`, {
+    return this.http.get<any[]>(`${this.apiUrl}/history`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -22,9 +27,9 @@ export class TransactionService {
   }
 
   getTransactionHistoryPaginated(page: number, size: number): Observable<any> {
-    const token = localStorage.getItem('token');
+    const token = this.authService.getToken();
 
-    return this.http.get<any>(`${this.apiUrl}/transactions/history/all`, {
+    return this.http.get<any>(`${this.apiUrl}/history/all`, {
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -39,7 +44,7 @@ export class TransactionService {
     receiverUsername: string;
     amount: number;
   }): Observable<any> {
-    const token = localStorage.getItem('token') || '';
+    const token = this.authService.getToken() || '';
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     const params = {
@@ -47,7 +52,7 @@ export class TransactionService {
       amount: data.amount.toString()
     };
 
-    return this.http.post(`${this.apiUrl}/transactions/transfer`, {}, { headers, params });
+    return this.http.post(`${this.apiUrl}/transfer`, {}, { headers, params });
   }
 
 }

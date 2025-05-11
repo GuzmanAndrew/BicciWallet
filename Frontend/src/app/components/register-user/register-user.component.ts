@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { RegistrationStateService } from '../../services/registration-state.service';
 
 @Component({
   selector: 'app-register-user',
@@ -26,7 +27,8 @@ export class RegisterUserComponent {
 
   constructor(
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private registrationStateService: RegistrationStateService
   ) { }
 
   togglePasswordVisibility() {
@@ -56,7 +58,7 @@ export class RegisterUserComponent {
       .subscribe({
         next: (response) => {
           console.log('Usuario registrado exitosamente', response);
-          localStorage.setItem('registeredUser', JSON.stringify(this.userData));
+          this.registrationStateService.setRegisteredUser(this.userData);
           this.router.navigate(['/register-account']);
         },
         error: (error) => {

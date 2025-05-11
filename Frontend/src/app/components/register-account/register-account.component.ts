@@ -1,7 +1,8 @@
-import { NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { isPlatformBrowser, NgIf } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { AccountService } from '../../services/account.service';
+import { RegistrationStateService } from '../../services/registration-state.service';
 
 @Component({
   selector: 'app-register-account',
@@ -10,7 +11,7 @@ import { AccountService } from '../../services/account.service';
   templateUrl: './register-account.component.html',
   styleUrl: './register-account.component.scss'
 })
-export class RegisterAccountComponent {
+export class RegisterAccountComponent implements OnInit {
 
   registeredUser: any = null;
   isLoading: boolean = false;
@@ -18,14 +19,14 @@ export class RegisterAccountComponent {
 
   constructor(
     private router: Router,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private registrationStateService: RegistrationStateService
   ) { }
 
   ngOnInit() {
-    const userData = localStorage.getItem('registeredUser');
-    if (userData) {
-      this.registeredUser = JSON.parse(userData);
-    } else {
+    this.registeredUser = this.registrationStateService.getRegisteredUser();
+
+    if (!this.registeredUser) {
       this.errorMessage = 'No se encontraron datos de usuario. Por favor regístrese primero.';
     }
   }
@@ -47,7 +48,9 @@ export class RegisterAccountComponent {
         next: (response) => {
           console.log('Cuenta bancaria creada exitosamente', response);
           this.isLoading = false;
-          localStorage.removeItem('registeredUser');
+
+          this.registrationStateService.clearRegisteredUser();
+
           this.router.navigate(['/login']);
         },
         error: (error) => {

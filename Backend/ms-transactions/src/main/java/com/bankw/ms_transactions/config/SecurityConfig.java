@@ -40,7 +40,11 @@ public class SecurityConfig {
       public void addCorsMappings(CorsRegistry registry) {
         registry
             .addMapping("/**")
-            .allowedOrigins("http://localhost:4200")
+            .allowedOrigins(
+                "http://localhost:4200",
+                "http://localhost:4000",
+                "http://frontend:4000",
+                "http://nginx-proxy:4200")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true);

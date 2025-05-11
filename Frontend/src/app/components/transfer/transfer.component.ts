@@ -1,10 +1,12 @@
-import { DatePipe } from '@angular/common';
-import { ApplicationRef, ChangeDetectorRef, Component, NgZone } from '@angular/core';
+import { DatePipe, isPlatformBrowser } from '@angular/common';
+import { ApplicationRef, ChangeDetectorRef, Component, Inject, NgZone, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
 import { AccountService } from '../../services/account.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-transfer',
@@ -13,7 +15,7 @@ import Swal from 'sweetalert2';
   templateUrl: './transfer.component.html',
   styleUrl: './transfer.component.scss'
 })
-export class TransferComponent {
+export class TransferComponent implements OnInit {
 
   rawBalance: number = 0;
   username: any;
@@ -27,16 +29,19 @@ export class TransferComponent {
   currentDate = new Date();
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
     private transactionService: TransactionService,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private authService: AuthService,
+    private userService: UserService
   ) { }
 
   ngOnInit() {
-    this.username = localStorage.getItem('username') || 'Usuario';
-    setTimeout(() => {
+    if (isPlatformBrowser(this.platformId)) {
+      this.username = this.authService.getUsername() || 'Usuario';
       this.loadAccountBalance();
-    });
+    }
   }
 
   get accountBalance(): string {
@@ -120,12 +125,11 @@ export class TransferComponent {
       showCancelButton: true,
       confirmButtonText: 'Sí, cerrar sesión',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#f44336',
-      cancelButtonColor: '#757575'
+      confirmButtonColor: '#fcd34d',
+      cancelButtonColor: '#fcd34d'
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
+        this.userService.logout();
         this.router.navigate(['/']).then(() => {
           Swal.fire({
             title: 'Sesión cerrada',

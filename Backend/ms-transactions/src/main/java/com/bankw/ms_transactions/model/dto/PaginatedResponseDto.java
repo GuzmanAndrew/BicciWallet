@@ -1,9 +1,13 @@
 package com.bankw.ms_transactions.model.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
+@Getter
+@Setter
 public class PaginatedResponseDto<T> {
     private List<T> content;
     private int currentPage;
@@ -17,35 +21,4 @@ public class PaginatedResponseDto<T> {
         this.totalPages = page.getTotalPages();
     }
 
-    public List<T> getContent() {
-        return content;
-    }
-
-    public void setContent(List<T> content) {
-        this.content = content;
-    }
-
-    public int getCurrentPage() {
-        return currentPage;
-    }
-
-    public void setCurrentPage(int currentPage) {
-        this.currentPage = currentPage;
-    }
-
-    public long getTotalItems() {
-        return totalItems;
-    }
-
-    public void setTotalItems(long totalItems) {
-        this.totalItems = totalItems;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
-    }
 }

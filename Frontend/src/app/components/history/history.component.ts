@@ -1,9 +1,11 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-history',
@@ -12,7 +14,7 @@ import Swal from 'sweetalert2';
   templateUrl: './history.component.html',
   styleUrl: './history.component.scss'
 })
-export class HistoryComponent {
+export class HistoryComponent implements OnInit {
 
   username: string = '';
   transactions: any[] = [];
@@ -25,13 +27,18 @@ export class HistoryComponent {
   isLoading: boolean = false;
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
-    private transactionService: TransactionService
+    private transactionService: TransactionService,
+    private authService: AuthService,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
-    this.username = localStorage.getItem('username') || 'Usuario';
-    this.loadTransactions();
+    if (isPlatformBrowser(this.platformId)) {
+      this.username = this.authService.getUsername() || 'Usuario';
+      this.loadTransactions();
+    }
   }
 
   loadTransactions(): void {
@@ -39,13 +46,10 @@ export class HistoryComponent {
     this.transactionService.getTransactionHistoryPaginated(this.currentPage, this.pageSize)
       .subscribe({
         next: (response: any) => {
-          // Asumiendo que la respuesta contiene los datos y la información de paginación
-          // Ajusta esto según la estructura real de tu API
           this.transactions = response.content || response;
           this.totalTransactions = response.totalElements || this.transactions.length;
           this.totalPages = response.totalPages || Math.ceil(this.totalTransactions / this.pageSize);
 
-          // Formatear las transacciones
           this.formatTransactions();
           this.isLoading = false;
         },
@@ -57,7 +61,7 @@ export class HistoryComponent {
   }
 
   formatTransactions(): void {
-    const currentUser = localStorage.getItem('username');
+    const currentUser = this.authService.getUsername();
     this.transactions = this.transactions.map(tx => {
       const isIncoming = tx.receiverUsername === currentUser;
       const amount = isIncoming ? Math.abs(tx.amount) : -Math.abs(tx.amount);
@@ -149,12 +153,11 @@ export class HistoryComponent {
       showCancelButton: true,
       confirmButtonText: 'Sí, cerrar sesión',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#f44336',
-      cancelButtonColor: '#757575'
+      confirmButtonColor: '#fcd34d',
+      cancelButtonColor: '#fcd34d'
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
+        this.userService.logout();
         this.router.navigate(['/']).then(() => {
           Swal.fire({
             title: 'Sesión cerrada',
