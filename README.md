@@ -65,43 +65,34 @@ BicciWallet aims to:
 
 ### Requirements
 
-- Java 17
-- Maven
-- Docker & Docker Compose
-- Postman (for testing)
+- Java JDK 17
+- AWS Account
+- Apache Maven
+- Angular CLI 17
+- Node.js + npm
 
 ### 1. Clone the project
 
 ```bash
-git clone https://github.com/your-org/BicciWallet.git
+git clone https://github.com/GuzmanAndrew/BicciWallet.git
 cd BicciWallet/Backend
 ```
 
-### 2. Run the application
-#### Option 1: Using Docker Compose (Recommended)
+### 2. Generate '.jar' files
+#### This command must be done for each microservice.
 
 ```bash
-cd Backend
-docker-compose up --build
+$ cd ms-users && mvn clean package -DskipTests
+$ cd ms-accounts && mvn clean package -DskipTests
+$ cd ms-transactions && mvn clean package -DskipTests
 ```
-#### Option 2: Using the deploy script
+### 3. Compile Angular proyect
 
 ```bash
-# Make the script executable (only needed once)
-chmod +x deploy.sh
-
-# Run the deploy script
-./deploy.sh
+$ ng build --configuration production
 ```
 
-#### To stop all containers:
-
-```bash
-cd Backend
-docker-compose down
-```
-
-### 3. Test APIs
+### 4. Test APIs
 
 The Postman collection is included in this repository under the name **BicciWallet_API.postman_collection.json**.
 
