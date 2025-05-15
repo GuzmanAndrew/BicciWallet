@@ -89,6 +89,7 @@ $ cd ms-transactions && mvn clean package -DskipTests
 ### 3. Compile Angular proyect
 
 ```bash
+$ npm install
 $ ng build --configuration production
 ```
 
