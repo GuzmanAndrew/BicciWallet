@@ -40,7 +40,7 @@ BicciWallet aims to:
 - Spring Boot 3
 - Maven
 - MySQL
-- Docker / Docker Compose
+- Angular 17
 
 ---
 
