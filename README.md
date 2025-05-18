@@ -40,7 +40,8 @@ BicciWallet aims to:
 - Spring Boot 3
 - Maven
 - MySQL
-- Docker / Docker Compose
+- Angular 17
+- AWS
 
 ---
 
@@ -63,45 +64,36 @@ BicciWallet aims to:
 
 ## 🧪 Installation & Usage
 
-### Requirements
-
-- Java 17
-- Maven
-- Docker & Docker Compose
-- Postman (for testing)
-
 ### 1. Clone the project
 
 ```bash
 git clone https://github.com/your-org/BicciWallet.git
-cd BicciWallet/Backend
+cd BicciWallet
 ```
 
-### 2. Run the application
-#### Option 1: Using Docker Compose (Recommended)
+### 2.  Build the backend
 
 ```bash
-cd Backend
-docker-compose up --build
+cd Backend/ms-users
+./mvnw clean package -DskipTests
+
+cd ../ms-accounts
+./mvnw clean package -DskipTests
+
+cd ../ms-transactions
+./mvnw clean package -DskipTests
 ```
-#### Option 2: Using the deploy script
+
+### 3.  Build the frontend
 
 ```bash
-# Make the script executable (only needed once)
-chmod +x deploy.sh
-
-# Run the deploy script
-./deploy.sh
+cd Frontend
+npm install
+ng build --configuration production
 ```
 
-#### To stop all containers:
 
-```bash
-cd Backend
-docker-compose down
-```
-
-### 3. Test APIs
+### 4. Test APIs
 
 The Postman collection is included in this repository under the name **BicciWallet_API.postman_collection.json**.
 
