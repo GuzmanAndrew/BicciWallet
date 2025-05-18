@@ -22,7 +22,7 @@ export class UserService {
       .set('username', username)
       .set('password', password);
 
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, {}, { params }).pipe(
+    return this.http.post<{ token: string }>(`${this.apiUrl}/users/login`, {}, { params }).pipe(
       tap((response) => {
         this.authService.setToken(response.token);
         this.authService.setUsername(username);
@@ -32,7 +32,7 @@ export class UserService {
   }
 
   register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+    return this.http.post(`${this.apiUrl}/users/register`, userData);
   }
 
   getUserProfile(): Observable<any> {
@@ -50,7 +50,7 @@ export class UserService {
       .set('Authorization', `Bearer ${token}`)
       .set('Content-Type', 'application/json');
 
-    return this.http.patch(`${this.apiUrl}/update`, userData, {
+    return this.http.patch(`${this.apiUrl}/users/update`, userData, {
       headers: headers
     }).pipe(
       catchError(error => {

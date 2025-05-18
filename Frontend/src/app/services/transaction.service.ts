@@ -19,7 +19,7 @@ export class TransactionService {
   getTransactionHistory(): Observable<any[]> {
     const token = this.authService.getToken();
 
-    return this.http.get<any[]>(`${this.apiUrl}/history`, {
+    return this.http.get<any[]>(`${this.apiUrl}/transactions/history`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -29,7 +29,7 @@ export class TransactionService {
   getTransactionHistoryPaginated(page: number, size: number): Observable<any> {
     const token = this.authService.getToken();
 
-    return this.http.get<any>(`${this.apiUrl}/history/all`, {
+    return this.http.get<any>(`${this.apiUrl}/transactions/history/all`, {
       headers: {
         Authorization: `Bearer ${token}`
       },

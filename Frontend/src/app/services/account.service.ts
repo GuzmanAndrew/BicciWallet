@@ -19,12 +19,12 @@ export class AccountService {
 
   createAccount(username: string): Observable<any> {
     const params = { username };
-    return this.http.post(`${this.apiUrl}/create`, {}, { params });
+    return this.http.post(`${this.apiUrl}/accounts/create`, {}, { params });
   }
 
   getAccountDetailsSecure(): Observable<any> {
     const token = this.authService.getToken();
-    return this.http.get(`${this.apiUrl}/v2/balance`, {
+    return this.http.get(`${this.apiUrl}/accounts/v2/balance`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

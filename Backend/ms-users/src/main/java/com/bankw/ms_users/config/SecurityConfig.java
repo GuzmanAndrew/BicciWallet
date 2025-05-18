@@ -23,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Configuration
@@ -70,12 +71,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(
-        Arrays.asList(
-            "http://localhost:4200",
-            "http://localhost:4000",
-            "http://frontend:4000",
-            "http://nginx-proxy:4200"));
+    configuration.setAllowedOrigins(List.of("HOST DE AWS FRONTEND"));
 
     configuration.setAllowedMethods(
         Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
