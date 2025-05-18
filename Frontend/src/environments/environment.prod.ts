@@ -1,6 +1,6 @@
 export const environment = {
    production: true,
-   apiUsers: '/api/users'
-   /* apiAccounts: 'http://ms-accounts:8082/api/accounts',
-   apiTransactions: 'http://ms-transactions:8083/api/transactions' */
+   apiUsers: '{COLOCA AQUI EL ENDPOINT DE AWS}',
+   apiAccounts: '{COLOCA AQUI EL ENDPOINT DE AWS}',
+   apiTransactions: '{COLOCA AQUI EL ENDPOINT DE AWS}'
 };

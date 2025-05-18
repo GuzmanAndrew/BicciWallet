@@ -2,14 +2,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionService {
 
-  //private apiUrl = '/api/transactions';
-  private apiUrl = 'http://localhost:8083/api/transactions';
+  private apiUrl = environment.apiTransactions;
 
   constructor(
     private http: HttpClient,

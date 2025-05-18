@@ -161,7 +161,6 @@ export class AuthService {
          localStorage.removeItem('token');
          localStorage.removeItem('username');
       } else if (this.isServer && this.response) {
-         // En el servidor, eliminar cookies
          try {
             this.response.setHeader('Set-Cookie', [
                'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict',
