@@ -39,7 +39,7 @@ export class UserService {
     const token = this.authService.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-    return this.http.get(`${this.apiUrl}/profile`, { headers }).pipe(
+    return this.http.get(`${this.apiUrl}/users/profile`, { headers }).pipe(
       catchError((error) => throwError(() => error))
     );
   }

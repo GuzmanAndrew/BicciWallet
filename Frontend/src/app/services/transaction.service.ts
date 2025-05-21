@@ -52,7 +52,7 @@ export class TransactionService {
       amount: data.amount.toString()
     };
 
-    return this.http.post(`${this.apiUrl}/transfer`, {}, { headers, params });
+    return this.http.post(`${this.apiUrl}/transactions/transfer`, {}, { headers, params });
   }
 
 }
