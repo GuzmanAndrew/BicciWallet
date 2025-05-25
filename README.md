@@ -45,20 +45,47 @@ BicciWallet aims to:
 
 ---
 
-## ✅ OWASP API Security Top 10 (2023) – Coverage
+## 🧩 OWASP API Risk Coverage per Microservice
 
-| #   | OWASP API Risk                                          | Implemented In     | Description                                                                 |
-|-----|----------------------------------------------------------|---------------------|-----------------------------------------------------------------------------|
-| A01 | Broken Object Level Authorization                       | ms-accounts         | `/find?username=` leaks any account data                                   |
-| A02 | Broken Authentication                                   | ms-users            | Weak login validation, long-lived JWTs, no brute force protection          |
-| A03 | Broken Object Property Level Authorization              | ms-users            | `/update-role` lets any user change roles without checks                   |
-| A04 | Unrestricted Resource Consumption                       | ms-accounts, ms-transactions | No pagination limit in `/history/all`, account creation flood               |
-| A05 | Broken Function Level Authorization                     | ms-users            | No role check in endpoint like `/delete-user`                              |
-| A06 | Unrestricted Access to Sensitive Data                   | ms-accounts, ms-transactions | `TransactionDto` exposes token, accounts expose full balance and type      |
-| A07 | Server Side Request Forgery (SSRF)                      | ms-transactions     | `/proxy?url=` calls arbitrary external/internal URLs                       |
-| A08 | Security Misconfiguration                               | all services         | CSRF/Headers disabled, stacktraces exposed                                 |
-| A09 | Improper Inventory Management                           | ms-accounts         | Old endpoint `/v1/balance` still active                                    |
-| A10 | Unsafe Consumption of APIs                              | ms-transactions     | Consumes responses without schema/validation from `ms-accounts`            |
+| OWASP Risk                          | ms-users | ms-accounts | ms-transactions |
+|------------------------------------|:--------:|:-----------:|:---------------:|
+| A01 – Broken Object Level Auth     | ❌       | ✅          | ✅              |
+| A02 – Broken Authentication        | ✅       | ❌          | ❌              |
+| A03 – Broken Object Property Auth  | ✅       | ❌          | ❌              |
+| A04 – Unrestricted Resource Usage  | ✅       | ✅          | ✅              |
+| A05 – Broken Function Level Auth   | ✅       | ❌          | ❌              |
+| A06 – Access to Sensitive Data     | ✅       | ✅          | ✅              |
+| A07 – Server Side Request Forgery  | ❌       | ❌          | ✅              |
+| A08 – Security Misconfiguration    | ✅       | ✅          | ✅              |
+| A09 – Improper Inventory Mgmt      | ❌       | ✅          | ❌              |
+| A10 – Unsafe API Consumption       | ❌       | ✅          | ❌              |
+
+> ✅ = Vulnerability detected in this microservice  
+> ❌ = Not detected or not applicable in semi-passive phase
+
+---
+
+## 🛡️ OWASP API Security Top 10 (2023) – Consolidated Coverage
+
+| #    | OWASP API Risk                              | Implemented In                             | Description                                                                                 |
+|------|---------------------------------------------|---------------------------------------------|---------------------------------------------------------------------------------------------|
+| A01  | Broken Object Level Authorization           | ms-accounts                                 | `/accounts/create?username=` allows creation of accounts for other users.                  |
+| A01  | Broken Object Level Authorization           | ms-transactions                             | `/transactions/transfer?receiverUsername=` enables transfers to arbitrary users.            |
+| A01  | Broken Object Level Authorization           | ms-accounts                                 | `/accounts/v1/balance?username=` exposes data from any account without access control.     |
+| A02  | Broken Authentication                       | ms-users                                    | Login via query string (`username`, `password`), lacking HTTPS and proper validation.       |
+| A03  | Broken Object Property Level Authorization  | ms-users                                    | `role` field can be set during registration.                                                |
+| A03  | Broken Object Property Level Authorization  | ms-users                                    | `password` field accepted in PATCH `/users/update` (Mass Assignment risk).                 |
+| A04  | Unrestricted Resource Consumption           | ms-users                                    | User registration lacks CAPTCHA or flood protection.                                       |
+| A04  | Unrestricted Resource Consumption           | ms-transactions                             | `/transactions/history/all?page=&size=` has no enforced limit on `size`.                   |
+| A05  | Broken Function Level Authorization         | ms-users                                    | `DELETE /users/delete?username=...` allows deletion of any user without authorization.     |
+| A06  | Unrestricted Access to Sensitive Data       | ms-accounts                                 | `/accounts/v2/balance` exposes `username`, `balance`, and `accountType`.                   |
+| A06  | Unrestricted Access to Sensitive Data       | ms-transactions                             | `/transactions/history` reveals the JWT (`rawToken`) used in the transaction.              |
+| A06  | Unrestricted Access to Sensitive Data       | ms-users                                    | `/users/profile` returns full user data with no minimization.                              |
+| A07  | Server Side Request Forgery (SSRF)          | ms-transactions                             | `/proxy?url=` allows arbitrary requests to internal or external URLs.                      |
+| A08  | Security Misconfiguration                   | all services                                | Missing security headers (`CSP`, `HSTS`, `X-Frame-Options`, etc.).                          |
+| A08  | Security Misconfiguration                   | ms-users                                    | Login sends credentials via URL.                                                            |
+| A09  | Improper Inventory Management               | ms-accounts                                 | Deprecated endpoint `/v1/balance` is still accessible.                                     |
+| A10  | Unsafe Consumption of APIs                  | ms-accounts                                 | `/accounts` consumes and trusts external API responses without validation/schema.          |
 
 ---
 
