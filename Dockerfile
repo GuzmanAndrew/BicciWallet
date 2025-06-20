@@ -37,7 +37,7 @@ RUN service mysql start && \
     mysql -e "FLUSH PRIVILEGES;"
 
 # 7. Exponer puertos
-EXPOSE 8081 8082 8083 4200 22 3306
+EXPOSE 8081 8082 8083 4200 22 3306  # Note: Host should map 3307 -> 3306
 
 # 8. Ejecutar todos los servicios
 CMD service ssh start && \
